@@ -16,5 +16,10 @@ protected:
 
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailLayout) override;
 
-	void OnValueChanged(float NewValue) const;
+	float GetCurrentIntensity() const;
+	float GetCurrentPitch() const;
+
+	void OnIntensityValueChanged(float NewValue) const;
+	void OnPitchValueChanged(float NewValue) const;
+	
 };

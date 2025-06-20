@@ -2,19 +2,26 @@
 
 #include "CustomDetailsPanels.h"
 
+#include "DirectionalLightCustomDetails.h"
+#include "Engine/DirectionalLight.h"
+
 #define LOCTEXT_NAMESPACE "FCustomDetailsPanelsModule"
 
 void FCustomDetailsPanelsModule::StartupModule()
 {
-	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+	PropertyEditorModule.RegisterCustomClassLayout(ADirectionalLight::StaticClass()->GetFName(),
+		FOnGetDetailCustomizationInstance::CreateStatic(&FDirectionalLightCustomDetails::MakeInstance));
 }
 
 void FCustomDetailsPanelsModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+	PropertyEditorModule.UnregisterCustomClassLayout(ADirectionalLight::StaticClass()->GetFName());
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FCustomDetailsPanelsModule, CustomDetailsPanels)
