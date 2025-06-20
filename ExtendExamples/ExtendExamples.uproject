@@ -26,6 +26,10 @@
 		{
 			"Name": "SimplePatrolAgent",
 			"Enabled": true
+		},
+		{
+			"Name": "CustomDetailsPanels",
+			"Enabled": true
 		}
 	]
 }
