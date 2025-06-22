@@ -1,0 +1,123 @@
+﻿#include "CustomObjectToolkit.h"
+#include "CustomObject.h"
+#include "SCustomObjectViewport.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "Internationalization/Text.h"
+#include "Framework/Docking/TabManager.h"
+
+FName ViewportTab = FName(TEXT("ViewportTab"));
+FName StatsTab = FName(TEXT("StatsTab"));
+FName DetailsTab = FName(TEXT("DetailsTab"));
+
+void FCustomObjectToolkit::InitEditor(const TSharedPtr<IToolkitHost >& InitToolkitHost, UCustomObject* Object)
+{
+	CustomObject = Object;
+	
+	const TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout(FName(TEXT("CustomEditorLayout")))
+	->AddArea
+	(
+		FTabManager::NewPrimaryArea()
+		->SetOrientation(Orient_Horizontal)
+		->Split
+		(
+			FTabManager::NewSplitter()
+			->SetOrientation(Orient_Vertical)
+			->SetSizeCoefficient(.65f)
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(.5f)
+				->AddTab(ViewportTab, ETabState::OpenedTab)
+				->SetHideTabWell(true)
+			)
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(.5f)
+				->AddTab(StatsTab, ETabState::OpenedTab)
+				->SetHideTabWell(true)
+			)
+		)
+		->Split
+		(
+			FTabManager::NewStack()
+			->SetSizeCoefficient(.35f)
+			->AddTab(DetailsTab, ETabState::OpenedTab)
+			->SetHideTabWell(true)
+		)
+	);
+	
+	InitAssetEditor(EToolkitMode::Standalone, InitToolkitHost, GetToolkitFName(), Layout, true, true, CustomObject.Get());
+}
+
+void FCustomObjectToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
+{
+	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(INVTEXT("CustomConfigEditor"));
+
+	// VIEWPORT
+	InTabManager->RegisterTabSpawner(ViewportTab, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	{
+		return SNew(SDockTab)
+		[
+			SNew(SOverlay)
+			+ SOverlay::Slot()
+			[
+				SNew(SCustomObjectViewport)
+				.EditingObject(CustomObject.Get())
+			]
+		];
+	}))
+	.SetDisplayName(INVTEXT("Viewport"))
+	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+
+	// STATS PLACEHOLDER
+	InTabManager->RegisterTabSpawner(StatsTab, FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+	{
+		return SNew(SDockTab)
+		.TabRole(PanelTab)
+		[
+			SNew(SOverlay)
+			+ SOverlay::Slot()
+			.Padding(10)
+			.VAlign(VAlign_Center)
+			.HAlign(HAlign_Center)
+			[
+				SNew(STextBlock)
+				.Visibility(EVisibility::HitTestInvisible)
+				.TextStyle(FAppStyle::Get(), "Graph.CornerText")
+				.Text(FText::FromString("STATS PLACEHOLDER"))
+			]
+		];
+	}))
+	.SetDisplayName(INVTEXT("Stats"))
+	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+
+	// DETAILS VIEW
+	FDetailsViewArgs DetailsViewArgs;
+	DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
+
+	const TSharedRef<IDetailsView> DetailsView = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(DetailsViewArgs);
+	DetailsView->SetObjects(TArray<UObject*>{CustomObject.Get()});
+	
+	InTabManager->RegisterTabSpawner(DetailsTab, FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+	{
+		return SNew(SDockTab)
+		.TabRole(PanelTab)
+		[
+			DetailsView
+		];
+	}))
+	.SetDisplayName(INVTEXT("Details"))
+	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+}
+
+void FCustomObjectToolkit::UnregisterTabSpawners(const TSharedRef<FTabManager>& TabManagerRef)
+{
+	CustomObject = nullptr;
+
+	TabManagerRef->UnregisterAllTabSpawners();
+	
+	FAssetEditorToolkit::UnregisterTabSpawners(TabManagerRef);
+}
+
