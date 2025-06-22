@@ -71,7 +71,7 @@ void FSimplePatrolAgentVisualizer::DrawVisualizationHUD(const UActorComponent* C
 			const double PosY = NormalizedProjectionY * Viewport->GetSizeXY().Y / Canvas->GetDPIScale();
 
 			FCanvasTextItem TextItem(FVector2D(PosX, PosY), FText::FromString(FString::FromInt(i)),
-			                         GEngine->GetSmallFont(), FLinearColor::White);
+			                         GEngine->GetSubtitleFont(), FLinearColor::White);
 			TextItem.EnableShadow(FLinearColor::Black);
 			Canvas->DrawItem(TextItem);
 		}
