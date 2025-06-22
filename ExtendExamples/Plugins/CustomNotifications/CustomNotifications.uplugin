@@ -1,0 +1,23 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "CustomNotifications",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "George",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "CustomNotifications",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

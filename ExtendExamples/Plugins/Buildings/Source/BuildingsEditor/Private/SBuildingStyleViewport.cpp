@@ -5,7 +5,7 @@
 
 void SBuildingStyleViewport::Construct(const FArguments& InArgs)
 {
-	// We need to create a new Scene before constructing this viewport. Otherwise, it will default to grabbing the one from the main World in the Editor
+	// 在构造之前，先创建一个新的预览场景，否则会默认获取编辑器的主世界的场景
 	AdvancedPreviewScene = MakeShareable(new FAdvancedPreviewScene(FPreviewScene::ConstructionValues()));
 
 	SEditorViewport::Construct(SEditorViewport::FArguments());
@@ -25,7 +25,8 @@ void SBuildingStyleViewport::Construct(const FArguments& InArgs)
 
 TSharedRef<FEditorViewportClient> SBuildingStyleViewport::MakeEditorViewportClient()
 {
-	LevelViewportClient = MakeShareable(new FEditorViewportClient(nullptr, AdvancedPreviewScene.Get(), SharedThis(this)));
+	LevelViewportClient = MakeShareable(new FEditorViewportClient(
+		nullptr, AdvancedPreviewScene.Get(), SharedThis(this)));
 	
 	LevelViewportClient->ViewportType = LVT_Perspective;
 	LevelViewportClient->bSetListenerPosition = false;

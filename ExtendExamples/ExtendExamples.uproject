@@ -38,6 +38,10 @@
 		{
 			"Name": "Buildings",
 			"Enabled": true
+		},
+		{
+			"Name": "CustomNotifications",
+			"Enabled": true
 		}
 	]
 }

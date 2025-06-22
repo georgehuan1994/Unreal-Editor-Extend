@@ -1,4 +1,5 @@
 #pragma once
+
 #include "SCommonEditorViewportToolbarBase.h"
 #include "SEditorViewport.h"
 
@@ -15,10 +16,12 @@ public:
 	
 	void Construct(const FArguments& InArgs);
 
-	// Toolbar interface
-	virtual TSharedRef<SEditorViewport> GetViewportWidget() override {return SharedThis(this);}
-	virtual TSharedPtr<FExtender> GetExtenders() const override {return MakeShareable(new FExtender);}
-	virtual void OnFloatingButtonClicked() override {}
+	virtual TSharedRef<SEditorViewport> GetViewportWidget() override { return SharedThis(this); }
+	virtual TSharedPtr<FExtender> GetExtenders() const override { return MakeShareable(new FExtender); }
+
+	virtual void OnFloatingButtonClicked() override
+	{
+	}
 	
 	TSharedPtr<FAdvancedPreviewScene> AdvancedPreviewScene = nullptr;
 	TSoftObjectPtr<UBuildingStylePreset> StylePreset = nullptr;
