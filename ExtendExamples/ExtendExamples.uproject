@@ -34,6 +34,10 @@
 		{
 			"Name": "CustomEditableAssets",
 			"Enabled": true
+		},
+		{
+			"Name": "Buildings",
+			"Enabled": true
 		}
 	]
 }

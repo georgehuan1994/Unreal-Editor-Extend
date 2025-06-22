@@ -19,6 +19,15 @@ void SCustomObjectViewport::Construct(const FArguments& InArgs)
 		return;
 	}
 
+	if (APointLight* PointLight = AdvancedPreviewScene->GetWorld()->SpawnActor<APointLight>())
+	{
+		PointLight->SetMobility(EComponentMobility::Movable);
+		PointLight->SetBrightness(5000.0f);
+		PointLight->SetRadius(CustomObject->Radius);
+		PointLight->SetLightColor(FLinearColor::Red);
+		PreviewActor = PointLight;
+	}
+
 	CustomObject->OnObjectChanged.AddSP(this, &SCustomObjectViewport::UpdatePreviewActor);
 	UpdatePreviewActor();
 }
@@ -27,20 +36,20 @@ void SCustomObjectViewport::UpdatePreviewActor()
 {
 	if (PreviewActor)
 	{
-		PreviewActor->Destroy();
-		PreviewActor = nullptr;
+		// PreviewActor->Destroy();
+		// PreviewActor = nullptr;
 	}
 }
 
 void SCustomObjectViewport::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
 	SEditorViewport::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
-	
+
 	if (PreviewActor)
 	{
-		float X = CustomObject->Radius * FMath::Cos(FPlatformTime::Seconds() * 0.1f * CustomObject->Speed);
-		float Y = CustomObject->Radius * FMath::Sin(FPlatformTime::Seconds() * 0.1f * CustomObject->Speed);
-		PreviewActor->SetActorLocation(FVector(X,Y,0));
+		float X = CustomObject->Radius * FMath::Cos(FPlatformTime::Seconds() * 1.f * CustomObject->Speed);
+		float Y = CustomObject->Radius * FMath::Sin(FPlatformTime::Seconds() * 1.f * CustomObject->Speed);
+		PreviewActor->SetActorLocation(FVector(X, Y, 0));
 	}
 }
 

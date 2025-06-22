@@ -39,4 +39,6 @@ public:
 	{
 		return FCustomEditableAssetsEditorModule::CustomAssetsEditorSlateStyle->GetBrush(FName("CustomAsset.Thumbnail"));
 	}
+
+	virtual EAssetCommandResult OpenAssets(const FAssetOpenArgs& OpenArgs) const override;
 };

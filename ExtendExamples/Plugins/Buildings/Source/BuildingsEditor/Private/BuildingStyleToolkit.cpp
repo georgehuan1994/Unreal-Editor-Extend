@@ -1,18 +1,18 @@
-﻿#include "CustomObjectToolkit.h"
-#include "CustomObject.h"
-#include "SCustomObjectViewport.h"
+﻿#include "BuildingStyleToolkit.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Internationalization/Text.h"
 #include "Framework/Docking/TabManager.h"
+#include "BuildingStylePreset.h"
+#include "SBuildingStyleViewport.h"
 
 FName ViewportTab = FName(TEXT("ViewportTab"));
 FName StatsTab = FName(TEXT("StatsTab"));
 FName DetailsTab = FName(TEXT("DetailsTab"));
 
-void FCustomObjectToolkit::InitEditor(const TSharedPtr<IToolkitHost >& InitToolkitHost, UCustomObject* Object)
+void FBuildingStyleToolkit::Initialize(const TSharedPtr<IToolkitHost>& InitToolkitHost, UBuildingStylePreset* StylePreset)
 {
-	CustomObject = Object;
+	BuildingStylePreset = StylePreset;
 	
 	const TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout(FName(TEXT("CustomEditorLayout")))
 	->AddArea
@@ -22,9 +22,9 @@ void FCustomObjectToolkit::InitEditor(const TSharedPtr<IToolkitHost >& InitToolk
 		->Split
 		(
 			FTabManager::NewStack()
-			 ->SetSizeCoefficient(.65f)
-			 ->AddTab(ViewportTab, ETabState::OpenedTab)
-			 ->SetHideTabWell(true)
+         	->SetSizeCoefficient(.65f)
+         	->AddTab(ViewportTab, ETabState::OpenedTab)
+         	->SetHideTabWell(true)
 		)
 		->Split
 		(
@@ -48,10 +48,10 @@ void FCustomObjectToolkit::InitEditor(const TSharedPtr<IToolkitHost >& InitToolk
 		)
 	);
 	
-	InitAssetEditor(EToolkitMode::Standalone, InitToolkitHost, GetToolkitFName(), Layout, true, true, CustomObject.Get());
+	InitAssetEditor(EToolkitMode::Standalone, InitToolkitHost, GetToolkitFName(), Layout, true, true, StylePreset);
 }
 
-void FCustomObjectToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
+void FBuildingStyleToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
 {
 	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(INVTEXT("CustomConfigEditor"));
 
@@ -63,8 +63,8 @@ void FCustomObjectToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& In
 			SNew(SOverlay)
 			+ SOverlay::Slot()
 			[
-				SNew(SCustomObjectViewport)
-				.EditingObject(CustomObject.Get())
+				SNew(SBuildingStyleViewport)
+				.EditingObject(BuildingStylePreset.Get())
 			]
 		];
 	}))
@@ -98,7 +98,7 @@ void FCustomObjectToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& In
 	DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
 
 	const TSharedRef<IDetailsView> DetailsView = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(DetailsViewArgs);
-	DetailsView->SetObjects(TArray<UObject*>{CustomObject.Get()});
+	DetailsView->SetObjects(TArray<UObject*>{BuildingStylePreset.Get()});
 	
 	InTabManager->RegisterTabSpawner(DetailsTab, FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
 	{
@@ -112,9 +112,9 @@ void FCustomObjectToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& In
 	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
 }
 
-void FCustomObjectToolkit::UnregisterTabSpawners(const TSharedRef<FTabManager>& TabManagerRef)
+void FBuildingStyleToolkit::UnregisterTabSpawners(const TSharedRef<FTabManager>& TabManagerRef)
 {
-	CustomObject = nullptr;
+	BuildingStylePreset = nullptr;
 
 	TabManagerRef->UnregisterAllTabSpawners();
 	
