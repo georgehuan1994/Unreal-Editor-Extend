@@ -15,8 +15,7 @@ public:
 		{
 		}
 	SLATE_END_ARGS()
-
-	/** Constructs this widget with InArgs */
+	
 	void Construct(const FArguments& InArgs);
 
 	void AddMessage(const FString& Message, const bool bIsError);

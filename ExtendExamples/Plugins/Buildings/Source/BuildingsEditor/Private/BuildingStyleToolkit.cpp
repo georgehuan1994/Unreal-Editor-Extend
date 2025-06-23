@@ -11,8 +11,7 @@ FName ViewportTab = FName(TEXT("ViewportTab"));
 FName StatsTab = FName(TEXT("StatsTab"));
 FName DetailsTab = FName(TEXT("DetailsTab"));
 
-void FBuildingStyleToolkit::Initialize(const TSharedPtr<IToolkitHost>& InitToolkitHost,
-                                       UBuildingStylePreset* StylePreset)
+void FBuildingStyleToolkit::Initialize(const TSharedPtr<IToolkitHost>& InitToolkitHost, UBuildingStylePreset* StylePreset)
 {
 	BuildingStylePreset = StylePreset;
 
@@ -77,20 +76,19 @@ void FBuildingStyleToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& I
 	InTabManager->RegisterTabSpawner(StatsTab, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
 	            {
 		            const auto StatsWidget = SNew(SBuildingStyleEditorStatsWidget);
-		            const int32 GroundFloorCornerMeshTriangleCount =
+		            const int32 GroundFloorCornerMeshLODs =
 			            BuildingStylePreset->GroundFloor.CornerMesh
-				            ? BuildingStylePreset->GroundFloor.CornerMesh->GetNumTriangles(0)
+				            ? BuildingStylePreset->GroundFloor.CornerMesh->GetNumLODs()
 				            : 0;
-		            const int32 GroundFloorWallMeshTriangleCount =
+		            const int32 GroundFloorWallMeshLODs =
 			            BuildingStylePreset->GroundFloor.WallMesh
-				            ? BuildingStylePreset->GroundFloor.WallMesh->GetNumTriangles(0)
+				            ? BuildingStylePreset->GroundFloor.WallMesh->GetNumLODs()
 				            : 0;
 
 		            StatsWidget->AddMessage(
-			            FString::Printf(TEXT("Ground Floor Triangle: %d"), GroundFloorCornerMeshTriangleCount), false);
+			            FString::Printf(TEXT("Ground Floor Corner LOD count: %d"), GroundFloorCornerMeshLODs), false);
 		            StatsWidget->AddMessage(
-			            FString::Printf(TEXT("Ground Floor Wall Triangle: %d"), GroundFloorWallMeshTriangleCount),
-			            false);
+			            FString::Printf(TEXT("Ground Floor Wall LOD count: %d"), GroundFloorWallMeshLODs),false);
 
 		            return SNew(SDockTab)
 			            .TabRole(PanelTab)

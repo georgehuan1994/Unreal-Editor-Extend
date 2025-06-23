@@ -63,7 +63,7 @@ void SBuildingStyleEditorStatsWidget::AddMessage(const FString& Message, const b
 			.VAlign(VAlign_Center)
 			[
 				SNew(STextBlock)
-				.TextStyle(FAppStyle::Get(), TEXT("RichTextBlock.Bold"))
+				.TextStyle(FAppStyle::Get(), TEXT("DataTableEditor.CellText"))
 				.ColorAndOpacity(bIsError ? FStyleColors::Error : FStyleColors::Warning)
 				.Text(FText::FromString(Message))
 				.ToolTipText(FText::FromString(Message))

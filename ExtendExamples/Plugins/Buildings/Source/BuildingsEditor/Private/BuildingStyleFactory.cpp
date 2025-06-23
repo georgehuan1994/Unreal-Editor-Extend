@@ -20,7 +20,6 @@ UObject* UBuildingStyleFactory::FactoryCreateNew(UClass* Class, UObject* InParen
 
 EAssetCommandResult UAssetDefinition_BuildingStylePreset::OpenAssets(const FAssetOpenArgs& OpenArgs) const
 {
-	return Super::OpenAssets(OpenArgs);
 	for (UBuildingStylePreset* EditingAsset : OpenArgs.LoadObjects<UBuildingStylePreset>())
 	{
 		const TSharedRef<FBuildingStyleToolkit> CustomObjectToolkit(new FBuildingStyleToolkit());
