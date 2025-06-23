@@ -4,50 +4,52 @@
 #include "Internationalization/Text.h"
 #include "Framework/Docking/TabManager.h"
 #include "BuildingStylePreset.h"
+#include "SBuildingStyleEditorStatsWidget.h"
 #include "SBuildingStyleViewport.h"
 
 FName ViewportTab = FName(TEXT("ViewportTab"));
 FName StatsTab = FName(TEXT("StatsTab"));
 FName DetailsTab = FName(TEXT("DetailsTab"));
 
-void FBuildingStyleToolkit::Initialize(const TSharedPtr<IToolkitHost>& InitToolkitHost, UBuildingStylePreset* StylePreset)
+void FBuildingStyleToolkit::Initialize(const TSharedPtr<IToolkitHost>& InitToolkitHost,
+                                       UBuildingStylePreset* StylePreset)
 {
 	BuildingStylePreset = StylePreset;
-	
+
 	const TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout(FName(TEXT("CustomEditorLayout")))
-	->AddArea
-	(
-		FTabManager::NewPrimaryArea()
-		->SetOrientation(Orient_Horizontal)
-		->Split
+		->AddArea
 		(
-			FTabManager::NewStack()
-         	->SetSizeCoefficient(.65f)
-         	->AddTab(ViewportTab, ETabState::OpenedTab)
-         	->SetHideTabWell(true)
-		)
-		->Split
-		(
-			FTabManager::NewSplitter()
-			->SetOrientation(Orient_Vertical)
-			->SetSizeCoefficient(.35f)
+			FTabManager::NewPrimaryArea()
+			->SetOrientation(Orient_Horizontal)
 			->Split
 			(
 				FTabManager::NewStack()
-				->SetSizeCoefficient(.8f)
-				->AddTab(DetailsTab, ETabState::OpenedTab)
+				->SetSizeCoefficient(.65f)
+				->AddTab(ViewportTab, ETabState::OpenedTab)
 				->SetHideTabWell(true)
 			)
 			->Split
 			(
-				FTabManager::NewStack()
-				->SetSizeCoefficient(.2f)
-				->AddTab(StatsTab, ETabState::OpenedTab)
-				->SetHideTabWell(true)
+				FTabManager::NewSplitter()
+				->SetOrientation(Orient_Vertical)
+				->SetSizeCoefficient(.35f)
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(.8f)
+					->AddTab(DetailsTab, ETabState::OpenedTab)
+					->SetHideTabWell(true)
+				)
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(.2f)
+					->AddTab(StatsTab, ETabState::OpenedTab)
+					->SetHideTabWell(true)
+				)
 			)
-		)
-	);
-	
+		);
+
 	InitAssetEditor(EToolkitMode::Standalone, InitToolkitHost, GetToolkitFName(), Layout, true, true, StylePreset);
 }
 
@@ -57,67 +59,71 @@ void FBuildingStyleToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& I
 
 	// VIEWPORT
 	InTabManager->RegisterTabSpawner(ViewportTab, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
-	{
-		return SNew(SDockTab)
-		[
-			SNew(SOverlay)
-			+ SOverlay::Slot()
-			[
-				SNew(SBuildingStyleViewport)
-				.EditingObject(BuildingStylePreset.Get())
-			]
-		];
-	}))
-	.SetDisplayName(INVTEXT("Viewport"))
-	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+	            {
+		            return SNew(SDockTab)
+			            [
+				            SNew(SOverlay)
+				            + SOverlay::Slot()
+				            [
+					            SNew(SBuildingStyleViewport)
+					            .EditingObject(BuildingStylePreset.Get())
+				            ]
+			            ];
+	            }))
+	            .SetDisplayName(INVTEXT("Viewport"))
+	            .SetGroup(WorkspaceMenuCategory.ToSharedRef());
 
-	// STATS PLACEHOLDER
-	InTabManager->RegisterTabSpawner(StatsTab, FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
-	{
-		return SNew(SDockTab)
-		.TabRole(PanelTab)
-		[
-			SNew(SOverlay)
-			+ SOverlay::Slot()
-			.Padding(10)
-			.VAlign(VAlign_Center)
-			.HAlign(HAlign_Center)
-			[
-				SNew(STextBlock)
-				.Visibility(EVisibility::HitTestInvisible)
-				.TextStyle(FAppStyle::Get(), "Graph.CornerText")
-				.Text(FText::FromString("STATS PLACEHOLDER"))
-			]
-		];
-	}))
-	.SetDisplayName(INVTEXT("Stats"))
-	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+	// STATS
+	InTabManager->RegisterTabSpawner(StatsTab, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	            {
+		            const auto StatsWidget = SNew(SBuildingStyleEditorStatsWidget);
+		            const int32 GroundFloorCornerMeshTriangleCount =
+			            BuildingStylePreset->GroundFloor.CornerMesh
+				            ? BuildingStylePreset->GroundFloor.CornerMesh->GetNumTriangles(0)
+				            : 0;
+		            const int32 GroundFloorWallMeshTriangleCount =
+			            BuildingStylePreset->GroundFloor.WallMesh
+				            ? BuildingStylePreset->GroundFloor.WallMesh->GetNumTriangles(0)
+				            : 0;
+
+		            StatsWidget->AddMessage(
+			            FString::Printf(TEXT("Ground Floor Triangle: %d"), GroundFloorCornerMeshTriangleCount), false);
+		            StatsWidget->AddMessage(
+			            FString::Printf(TEXT("Ground Floor Wall Triangle: %d"), GroundFloorWallMeshTriangleCount),
+			            false);
+
+		            return SNew(SDockTab)
+			            .TabRole(PanelTab)
+			            [
+				            StatsWidget
+			            ];
+	            }))
+	            .SetDisplayName(INVTEXT("Stats"))
+	            .SetGroup(WorkspaceMenuCategory.ToSharedRef());
 
 	// DETAILS VIEW
 	FDetailsViewArgs DetailsViewArgs;
 	DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
 
-	const TSharedRef<IDetailsView> DetailsView = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(DetailsViewArgs);
+	const TSharedRef<IDetailsView> DetailsView = FModuleManager::GetModuleChecked<
+		FPropertyEditorModule>("PropertyEditor").CreateDetailView(DetailsViewArgs);
 	DetailsView->SetObjects(TArray<UObject*>{BuildingStylePreset.Get()});
-	
+
 	InTabManager->RegisterTabSpawner(DetailsTab, FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
-	{
-		return SNew(SDockTab)
-		.TabRole(PanelTab)
-		[
-			DetailsView
-		];
-	}))
-	.SetDisplayName(INVTEXT("Details"))
-	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
+	            {
+		            return SNew(SDockTab)
+			            .TabRole(PanelTab)
+			            [
+				            DetailsView
+			            ];
+	            }))
+	            .SetDisplayName(INVTEXT("Details"))
+	            .SetGroup(WorkspaceMenuCategory.ToSharedRef());
 }
 
 void FBuildingStyleToolkit::UnregisterTabSpawners(const TSharedRef<FTabManager>& TabManagerRef)
 {
 	BuildingStylePreset = nullptr;
-
 	TabManagerRef->UnregisterAllTabSpawners();
-	
 	FAssetEditorToolkit::UnregisterTabSpawners(TabManagerRef);
 }
-
