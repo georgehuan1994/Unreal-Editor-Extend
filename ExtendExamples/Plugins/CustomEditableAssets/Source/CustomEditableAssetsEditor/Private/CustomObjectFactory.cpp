@@ -24,7 +24,6 @@ UObject* UCustomObjectFactory::FactoryCreateNew(UClass* Class, UObject* InParent
 
 EAssetCommandResult UAssetDefinition_CustomObject::OpenAssets(const FAssetOpenArgs& OpenArgs) const
 {
-	// return Super::OpenAssets(OpenArgs);
 	for (UCustomObject* EditingAsset : OpenArgs.LoadObjects<UCustomObject>())
 	{
 		const TSharedRef<FCustomObjectToolkit> Toolkit = MakeShared<FCustomObjectToolkit>();

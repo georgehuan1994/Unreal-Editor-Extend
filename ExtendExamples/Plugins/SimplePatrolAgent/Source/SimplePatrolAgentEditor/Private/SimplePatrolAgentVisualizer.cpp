@@ -93,20 +93,6 @@ bool FSimplePatrolAgentVisualizer::VisProxyHandleClick(FEditorViewportClient* In
 	return false;
 }
 
-bool FSimplePatrolAgentVisualizer::GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const
-{
-	if (IsValid(PatrolAgentComponent.Get()) && SelectedProxyId >= 0)
-	{
-		if(const AActor* PatrolPointActor = PatrolAgentComponent->PatrolPoints[SelectedProxyId]; IsValid(PatrolPointActor))
-		{
-			OutLocation = PatrolPointActor->GetActorLocation();
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool FSimplePatrolAgentVisualizer::HandleInputDelta(FEditorViewportClient* ViewportClient,
 	FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltaRotate, FVector& DeltaScale)
 {
@@ -122,3 +108,16 @@ bool FSimplePatrolAgentVisualizer::HandleInputDelta(FEditorViewportClient* Viewp
 	return false;
 }
 
+bool FSimplePatrolAgentVisualizer::GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const
+{
+	if (IsValid(PatrolAgentComponent.Get()) && SelectedProxyId >= 0)
+	{
+		if(const AActor* PatrolPointActor = PatrolAgentComponent->PatrolPoints[SelectedProxyId]; IsValid(PatrolPointActor))
+		{
+			OutLocation = PatrolPointActor->GetActorLocation();
+			return true;
+		}
+	}
+
+	return false;
+}
