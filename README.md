@@ -1,2 +1,7 @@
-# Unreal-Editor-Extend
+# Unreal Editor Extend
+
+充分利用 Unreal 既有框架扩展编辑器
+
 Making the most of Unreal Engine’s existing Framework
+
+https://gorh.cn/mini-library/?document_id=60009
